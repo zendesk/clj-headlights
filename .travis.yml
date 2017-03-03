@@ -1,0 +1,16 @@
+sudo: false
+language: clojure
+script: ./scripts/run_ci.sh
+branches:
+  only:
+    - master
+jdk:
+  - oraclejdk8
+env:
+  matrix:
+    - CI_PART=unit
+    - CI_PART=eastwood
+cache:
+  timeout: 259200 # 3 days
+  directories:
+    - $HOME/.m2/repository
