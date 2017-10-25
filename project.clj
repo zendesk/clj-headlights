@@ -25,4 +25,7 @@
              :test [:dev {:dependencies [[junit "4.12"]
                                          [org.hamcrest/hamcrest-all "1.3"]]}]
              :uberjar [:release {:aot :all}]}
-  :plugins [[jonase/eastwood "0.2.5"]])
+  :codox {:source-uri "https://github.com/zendesk/clj-headlights/blob/master/{filepath}#L{line}"
+          :metadata {:doc/format :markdown}}
+  :plugins [[jonase/eastwood "0.2.5"]
+            [lein-codox "0.10.3"]])
