@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+set -x
 
 if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
     exit 0
@@ -17,21 +19,17 @@ mkdir -p target
 git clone https://github.com/zendesk/clj-headlights target/doc
 cd target/doc
 git checkout gh-pages
-rm -r *
+rm -rf ./*
 cd ../..
-lein codex
+lein codox
 cd target/doc
 git add .
 git commit -am "New documentation for $TRAVIS_COMMIT"
 
-ENCRYPTED_KEY_VAR="encrypted_${ENCRYPTION_LABEL}_key"
-ENCRYPTED_IV_VAR="encrypted_${ENCRYPTION_LABEL}_iv"
-ENCRYPTED_KEY=${!ENCRYPTED_KEY_VAR}
-ENCRYPTED_IV=${!ENCRYPTED_IV_VAR}
-openssl aes-256-cbc -K $ENCRYPTED_KEY -iv $ENCRYPTED_IV -in ../travis-github-key.enc -out ../travis-github-key -d
-chmod 600 ../travis-github-key
+openssl aes-256-cbc -K $encrypted_7b8432f5ae93_key -iv $encrypted_7b8432f5ae93_iv -in ../../travis-github-key.enc -out ../../travis-github-key -d
+chmod 600 ../../travis-github-key
 eval `ssh-agent -s`
-ssh-add travis-github-key
+ssh-add ../../travis-github-key
 
-git push -u origin gh-pages
+git push origin gh-pages
 cd ../..
