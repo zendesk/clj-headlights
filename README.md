@@ -17,7 +17,7 @@ It is not intended as a full replacement for the [Beam Java SDK](https://beam.ap
   (str/split line #" "))
   
 (defn word-starts-with? [word substr]
-  (clojure.string/starts-with? word substr))
+  (str/starts-with? word substr))
 
 (let [pipeline (hl/create (hl/options {:job-name "wordcount"}))]
   (-> pipeline
