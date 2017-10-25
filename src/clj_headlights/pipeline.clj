@@ -197,6 +197,7 @@
   (.apply pcoll name (GroupByKey/create)))
 
 (s/defn composite
+  "Nests transforms that happen in f into a composite transform"
   [name :- s/Str
    inputs :- [pcollections/PCollectionType]
    f :- IFn]

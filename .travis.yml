@@ -14,3 +14,6 @@ cache:
   timeout: 259200 # 3 days
   directories:
     - $HOME/.m2/repository
+
+after_success:
+- ./scripts/deploy_codox.sh
