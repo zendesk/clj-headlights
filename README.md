@@ -19,7 +19,7 @@ It is not intended as a full replacement for the [Beam Java SDK](https://beam.ap
 (let [pipeline (hl/create (hl/options {:job-name "wordcount"}))]
   (-> pipeline
       (io/resource-string->pcollection "read-file" "file://file.txt")
-      (hl/hl-mapcat "split-words" #'split-words)))
+      (hl/df-mapcat "split-words" #'split-words)))
 ```
 
 You can find example projects in the [examples](./examples) directory, and in the [test/clj_headlights/examples](test/clj_headlights/examples) directory.
