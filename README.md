@@ -24,6 +24,10 @@ It is not intended as a full replacement for the [Beam Java SDK](https://beam.ap
 
 You can find example projects in the [examples](./examples) directory, and in the [test/clj_headlights/examples](test/clj_headlights/examples) directory.
 
+## Documentation
+
+See official documentation at https://zendesk.github.io/clj-headlights/
+
 ## Versioning
 
 [Semver](http://semver.org/) is used as versioning scheme.
