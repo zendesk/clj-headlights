@@ -15,11 +15,16 @@ It is not intended as a full replacement for the [Beam Java SDK](https://beam.ap
 ```clojure
 (defn split-words [line]
   (str/split line #" "))
+  
+(defn word-starts-with? [word substr]
+  (clojure.string/starts-with? word substr))
 
 (let [pipeline (hl/create (hl/options {:job-name "wordcount"}))]
   (-> pipeline
       (io/resource-string->pcollection "read-file" "file://file.txt")
-      (hl/df-mapcat "split-words" #'split-words)))
+      (hl/df-mapcat "split-words" #'split-words)
+      (hl/df-filter "only-f-words" [#'word-starts-with? "f"])
+      (hl/df-map "count-chars" #'count)))
 ```
 
 You can find example projects in the [examples](./examples) directory, and in the [test/clj_headlights/examples](test/clj_headlights/examples) directory.
