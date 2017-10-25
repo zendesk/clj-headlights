@@ -7,6 +7,8 @@ branches:
 jdk:
   - oraclejdk8
 env:
+  global:
+    - ENCRYPTION_LABEL: 7b8432f5ae93
   matrix:
     - CI_PART=unit
     - CI_PART=eastwood
