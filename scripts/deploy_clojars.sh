@@ -11,6 +11,5 @@ if [ "$TRAVIS_BRANCH" != "master" ]; then
 fi
 
 mkdir -p ${HOME}/.lein
-echo "{#\"https://clojars.org/repo\" {:username \"${clojars_username}\" :password \"${clojars_password}\"}}" > ${HOME}/.lein/credentials.clj
-
+echo "{:auth {:repository-auth {#\"clojars\" {:username \"${clojars_username}\" :password \"${clojars_password}\"}}}}" > ${HOME}/.lein/profiles.clj
 lein with-profile release deploy clojars
