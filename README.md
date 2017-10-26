@@ -1,7 +1,6 @@
 # clj-headlights
 
 [![Build Status](https://travis-ci.org/zendesk/clj-headlights.svg?branch=master)](https://travis-ci.org/zendesk/clj-headlights)
-
 [![Clojars Project](https://img.shields.io/clojars/v/com.zendesk/clj-headlights.svg)](https://clojars.org/com.zendesk/clj-headlights)
 
 Clj-headlights is a toolset for [Apache Beam](https://beam.apache.org/) to use Clojure code and construct pipelines.
@@ -10,8 +9,15 @@ It is not intended as a full replacement for the [Beam Java SDK](https://beam.ap
 
 ## Usage
 
+Latest stable version
 ```clojure
 [com.zendesk/clj-headlights "0.1.0"]
+```
+
+To get the latest build in from the master branch (may contain breaking changes)
+
+```clojure
+[com.zendesk/clj-headlights "master-SNAPSHOT"]
 ```
 
 ### Examples
