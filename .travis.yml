@@ -16,4 +16,4 @@ cache:
     - $HOME/.m2/repository
 
 after_success:
-- ./scripts/deploy_codox.sh
+  - ./scripts/deploy_codox.sh
