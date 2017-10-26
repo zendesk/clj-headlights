@@ -1,19 +1,19 @@
 sudo: false
 language: clojure
-script: ./scripts/run_ci.sh
 branches:
   only:
     - master
 jdk:
   - oraclejdk8
-env:
-  matrix:
-    - CI_PART=unit
-    - CI_PART=eastwood
+jobs:
+  include:
+    - stage: test
+      script: CI_PART=unit ./scripts/run_ci.sh
+    -
+      script: CI_PART=eastwood ./scripts/run_ci.sh
+    - stage: deploy
+      script: ./scripts/deploy_codox.sh
 cache:
   timeout: 259200 # 3 days
   directories:
     - $HOME/.m2/repository
-
-after_success:
-  - ./scripts/deploy_codox.sh
