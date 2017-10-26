@@ -28,7 +28,6 @@ cd ../..
 lein codox
 cd target/doc
 git add .
-git commit -am "New documentation for $TRAVIS_COMMIT"
-
-git push origin gh-pages
+git commit -am "New documentation for $TRAVIS_COMMIT" || true
+git push origin gh-pages || true
 cd ../..
