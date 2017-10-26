@@ -13,6 +13,8 @@ jobs:
       script: CI_PART=eastwood ./scripts/run_ci.sh
     - stage: deploy
       script: ./scripts/deploy_codox.sh
+    -
+      script: ./scripts/deploy_clojars.sh
 cache:
   timeout: 259200 # 3 days
   directories:
