@@ -16,7 +16,7 @@ git config user.email "travis_ci@zendesk.com"
 
 rm -rf target/doc
 mkdir -p target
-git clone https://github.com/zendesk/clj-headlights target/doc
+git clone git@github.com:zendesk/clj-headlights.git target/doc
 cd target/doc
 git checkout gh-pages
 rm -rf ./*
