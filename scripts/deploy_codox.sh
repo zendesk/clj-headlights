@@ -13,6 +13,10 @@ fi
 
 git config user.name "Travis CI"
 git config user.email "travis_ci@zendesk.com"
+openssl aes-256-cbc -K $encrypted_7b8432f5ae93_key -iv $encrypted_7b8432f5ae93_iv -in travis-github-key.enc -out travis-github-key -d
+chmod 600 travis-github-key
+eval `ssh-agent -s`
+ssh-add travis-github-key
 
 rm -rf target/doc
 mkdir -p target
@@ -25,11 +29,6 @@ lein codox
 cd target/doc
 git add .
 git commit -am "New documentation for $TRAVIS_COMMIT"
-
-openssl aes-256-cbc -K $encrypted_7b8432f5ae93_key -iv $encrypted_7b8432f5ae93_iv -in ../../travis-github-key.enc -out ../../travis-github-key -d
-chmod 600 ../../travis-github-key
-eval `ssh-agent -s`
-ssh-add ../../travis-github-key
 
 git push origin gh-pages
 cd ../..
