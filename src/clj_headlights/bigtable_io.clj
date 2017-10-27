@@ -57,12 +57,16 @@
 
 (defn bigtable-io-write
   [pcoll name project {:keys [instance user-agent table]}]
-  (-> pcoll
-      (df/df-map (str "make-bigtable-KV-" name) #'row->bigtable-kv)
-      (.apply (str "write-to-bigtable-" name)
-              (-> ^BigtableIO$Write (BigtableIO/write)
-                  (.withBigtableOptions ^BigtableOptions$Builder (options-builder project instance user-agent))
-                  (.withTableId table)))))
+  (df/composite
+    name
+    [pcoll]
+    (fn [pcoll]
+      (-> pcoll
+          (df/df-map "make-bigtable-kv" #'row->bigtable-kv)
+          (.apply "write"
+                  (-> ^BigtableIO$Write (BigtableIO/write)
+                      (.withBigtableOptions ^BigtableOptions$Builder (options-builder project instance user-agent))
+                      (.withTableId table)))))))
 
 (defn get-cells-data
   [cell-list]
