@@ -2,11 +2,12 @@
   (:require [schema.core :as s]
             [clj-headlights.pipeline :as df]
             [clj-headlights.pcollections :as pcollections])
-  (:import (com.google.cloud.bigtable.config BigtableOptions$Builder)
+  (:import (com.google.cloud.bigtable.config BigtableOptions$Builder BigtableOptions)
            (org.apache.beam.sdk.io.gcp.bigtable BigtableIO BigtableIO$Write)
            (org.apache.beam.sdk.values KV)
            (com.google.protobuf ByteString)
-           (com.google.bigtable.v2 Mutation$SetCell Mutation Mutation$SetCell$Builder Mutation$Builder Row Family Column Cell)))
+           (com.google.bigtable.v2 Mutation$SetCell Mutation Mutation$SetCell$Builder Mutation$Builder Row Family Column Cell)
+           (com.google.cloud ByteArray)))
 
 (s/def TableMutation
   {:column-family s/Str
@@ -20,10 +21,10 @@
    :table s/Str})
 
 (s/def BigtableReadRow
-  [(s/one s/Str "key")
+  [(s/one ByteArray "key")
    (s/one {s/Keyword   ; Column Family
            {s/Keyword   ; Column Qualifier
-            [{:value s/Str :timestamp-micro s/Int}]}} "value")])
+            [{:value ByteArray :timestamp-micro s/Int}]}} "value")])
 
 (s/def BigtableWriteRow
   [(s/one s/Str "key")
@@ -71,7 +72,7 @@
 (defn get-cells-data
   [cell-list]
   (map (fn [^Cell cell]
-         {:value (-> cell .getValue)
+         {:value (-> cell .getValue .toByteArray)
           :timestamp-micro (.getTimestampMicros cell)})
        cell-list))
 
@@ -85,7 +86,7 @@
 
 (s/defn bigtable-row->clj-map :- BigtableReadRow
   [row :- Row]
-  (let [key (-> row .getKey .toStringUtf8)
+  (let [key (-> row .getKey .toByteArray)
         familiy-names (->> row
                            .getFamiliesList
                            (map #(.getName ^Family %))
