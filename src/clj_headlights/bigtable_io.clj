@@ -97,18 +97,37 @@
           (map get-columns-data)
           (zipmap familiy-names))]))
 
+(s/defn read-table-raw-from-options
+  "Reads data from `table` using `BigtableOptions`
+  object passed in. Must use `BigtableOptions$Builder`
+  to construct options"
+  [pipeline :- pcollections/PCollectionType
+   name :- s/Str
+   table :- s/Str
+   bigtable-options :- BigtableOptions]
+  (-> pipeline
+      (.apply (str "read-from-bigtable-" name)
+              (-> (BigtableIO/read)
+                  (.withBigtableOptions bigtable-options)
+                  (.withTableId table)))))
+
 (s/defn bigtable-io-read-table-raw
+  "Similar to `read-table-raw-from-options`but builds
+   `BigtableOptions` from hashmap supplied in arguments"
   [pipeline :- pcollections/PCollectionType
    name :- s/Str
    project :- s/Str
    {:keys [instance user-agent table]}]
-  (-> pipeline
-      (.apply (str "read-from-bigtable-" name)
-              (-> (BigtableIO/read)
-                  (.withBigtableOptions ^BigtableOptions$Builder (options-builder project instance user-agent))
-                  (.withTableId table)))))
+  (read-table-raw-from-options
+    pipeline
+    name
+    table
+    (options-builder project instance user-agent)))
 
 (s/defn bigtable-io-read-table
+  "Reads from bigtableIO and converts the rows into a native map
+   of `BigtableReadRow` format. If you are using custom serialization
+   use `bigtable-io-read-table-raw` or `read-table-raw-from-options`"
   [pipeline :- pcollections/PCollectionType
    name :- s/Str
    project :- s/Str
