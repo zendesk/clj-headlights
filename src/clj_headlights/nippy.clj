@@ -15,8 +15,14 @@
     (.read stream payload)
     (thaw payload)))
 
-(defn fast-encode-stream [^OutputStream stream data]
+(defn ^Integer fast-encode-stream
+  "Encode the given data with nippy, write the length of the resulting byte
+   array on the stream as an integer, then write the serialized data. Returns
+   the number of bytes written."
+  [^OutputStream stream data]
   (let [daos (DataOutputStream. stream)
-        bytes ^"[B" (freeze data)]
-    (.writeInt daos (alength bytes))
-    (.write daos bytes)))
+        bytes ^"[B" (freeze data)
+        bytes-count (alength bytes)]
+    (.writeInt daos bytes-count)
+    (.write daos bytes)
+    (+ 4 bytes-count)))

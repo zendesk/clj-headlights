@@ -16,19 +16,45 @@ import org.slf4j.LoggerFactory;
  */
 public class NippyCoder extends AtomicCoder<Object> {
     private static final Logger LOG = LoggerFactory.getLogger(NippyCoder.class);
+    private final Symbol nippyNs = (Symbol)Clojure.var("clojure.core","symbol").invoke("clj-headlights.nippy");
+    private final int bytesWrittenWarnThreshold;
+    private final String name;
+
+    private NippyCoder(String name, int bytesWrittenWarnThreshold) {
+        this.name = name;
+        this.bytesWrittenWarnThreshold = bytesWrittenWarnThreshold;
+    }
+
+    private NippyCoder(String name) {
+        this(name, 104857600); // 100MB, recommended max by Google.
+    }
+
+    public NippyCoder() {
+        this("unknown");
+    }
+
+    public static NippyCoder of(String name, int bytesWrittenWarnThreshold) {
+        return new NippyCoder(name, bytesWrittenWarnThreshold);
+    }
+
+    public static NippyCoder of(String name) {
+        return new NippyCoder(name);
+    }
+
     public static NippyCoder of() {
         return new NippyCoder();
     }
-    Symbol nippy_ns = (Symbol)Clojure.var("clojure.core","symbol").invoke("clj-headlights.nippy");
-
 
     private void clojurePrint(OutputStream out, Object o) {
-        System.ensureInitialized(nippy_ns);
-        Clojure.var("clj-headlights.nippy","fast-encode-stream").invoke(out, o);
+        System.ensureInitialized(nippyNs);
+        Long bytesWritten = (Long) Clojure.var("clj-headlights.nippy","fast-encode-stream").invoke(out, o);
+        if (bytesWritten > bytesWrittenWarnThreshold) {
+            LOG.warn("NippyCoder \"{}\" wrote more than {} bytes: {} bytes written.", this.name, bytesWrittenWarnThreshold, bytesWritten);
+        }
     }
 
     private Object clojureRead(InputStream in) {
-        System.ensureInitialized(nippy_ns);
+        System.ensureInitialized(nippyNs);
         return Clojure.var("clj-headlights.nippy","fast-decode-stream").invoke(in);
     }
 
@@ -42,6 +68,7 @@ public class NippyCoder extends AtomicCoder<Object> {
         return clojureRead(in);
     }
 
+    @Override
     public void verifyDeterministic() throws NonDeterministicException {
         throw new NonDeterministicException(this, "nippy is not deterministic");
     }
