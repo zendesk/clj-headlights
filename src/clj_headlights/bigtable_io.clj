@@ -2,11 +2,12 @@
   (:require [schema.core :as s]
             [clj-headlights.pipeline :as df]
             [clj-headlights.pcollections :as pcollections])
-  (:import (com.google.cloud.bigtable.config BigtableOptions$Builder)
+  (:import (com.google.cloud.bigtable.config BigtableOptions$Builder BigtableOptions)
            (org.apache.beam.sdk.io.gcp.bigtable BigtableIO BigtableIO$Write)
            (org.apache.beam.sdk.values KV)
            (com.google.protobuf ByteString)
-           (com.google.bigtable.v2 Mutation$SetCell Mutation Mutation$SetCell$Builder Mutation$Builder Row Family Column Cell)))
+           (com.google.bigtable.v2 Mutation$SetCell Mutation Mutation$SetCell$Builder Mutation$Builder Row Family Column Cell)
+           (com.google.cloud ByteArray)))
 
 (s/def TableMutation
   {:column-family s/Str
@@ -20,10 +21,10 @@
    :table s/Str})
 
 (s/def BigtableReadRow
-  [(s/one s/Str "key")
+  [(s/one ByteArray "key")
    (s/one {s/Keyword   ; Column Family
            {s/Keyword   ; Column Qualifier
-            [{:value s/Str :timestamp-micro s/Int}]}} "value")])
+            [{:value ByteArray :timestamp-micro s/Int}]}} "value")])
 
 (s/def BigtableWriteRow
   [(s/one s/Str "key")
@@ -71,7 +72,7 @@
 (defn get-cells-data
   [cell-list]
   (map (fn [^Cell cell]
-         {:value (-> cell .getValue)
+         {:value (-> cell .getValue .toByteArray)
           :timestamp-micro (.getTimestampMicros cell)})
        cell-list))
 
@@ -85,7 +86,7 @@
 
 (s/defn bigtable-row->clj-map :- BigtableReadRow
   [row :- Row]
-  (let [key (-> row .getKey .toStringUtf8)
+  (let [key (-> row .getKey .toByteArray)
         familiy-names (->> row
                            .getFamiliesList
                            (map #(.getName ^Family %))
@@ -97,18 +98,37 @@
           (map get-columns-data)
           (zipmap familiy-names))]))
 
+(s/defn read-table-raw-from-options
+  "Reads data from `table` using `BigtableOptions`
+  object passed in. Must use `BigtableOptions$Builder`
+  to construct options"
+  [pipeline :- pcollections/PCollectionType
+   name :- s/Str
+   table :- s/Str
+   bigtable-options :- BigtableOptions]
+  (-> pipeline
+      (.apply (str "read-from-bigtable-" name)
+              (-> (BigtableIO/read)
+                  (.withBigtableOptions bigtable-options)
+                  (.withTableId table)))))
+
 (s/defn bigtable-io-read-table-raw
+  "Similar to `read-table-raw-from-options`but builds
+   `BigtableOptions` from hashmap supplied in arguments"
   [pipeline :- pcollections/PCollectionType
    name :- s/Str
    project :- s/Str
    {:keys [instance user-agent table]}]
-  (-> pipeline
-      (.apply (str "read-from-bigtable-" name)
-              (-> (BigtableIO/read)
-                  (.withBigtableOptions ^BigtableOptions$Builder (options-builder project instance user-agent))
-                  (.withTableId table)))))
+  (read-table-raw-from-options
+    pipeline
+    name
+    table
+    (options-builder project instance user-agent)))
 
 (s/defn bigtable-io-read-table
+  "Reads from bigtableIO and converts the rows into a native map
+   of `BigtableReadRow` format. If you are using custom serialization
+   use `bigtable-io-read-table-raw` or `read-table-raw-from-options`"
   [pipeline :- pcollections/PCollectionType
    name :- s/Str
    project :- s/Str
