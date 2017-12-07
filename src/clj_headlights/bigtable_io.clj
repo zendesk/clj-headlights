@@ -71,7 +71,7 @@
 (defn get-cells-data
   [cell-list]
   (map (fn [^Cell cell]
-         {:value (-> cell .getValue)
+         {:value (-> cell .getValue .toStringUtf8)
           :timestamp-micro (.getTimestampMicros cell)})
        cell-list))
 
