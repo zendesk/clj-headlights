@@ -8,7 +8,7 @@ The [GitHub issues section](https://github.com/zendesk/clj-headlights/issues) is
 
 ## Getting set up
 
-1. Make sure you have a working Clojure development environment. This include a JDK, Clojure, and [leiningen](https://github.com/technomancy/leiningen). 
+1. Make sure you have a working Clojure development environment. This include a JDK, Clojure, and [leiningen](https://github.com/technomancy/leiningen).
 2. Fork and clone the repository.
 3. Hack away.
 4. Make sure `lein test` and `lein eastwood` pass.
@@ -33,3 +33,12 @@ In order to be merged, a pull-request requires two positive reviews from the tea
 ###### Tests and documentation
 
 Any new code change need to have associated tests. New functions need to have associated documentation.
+
+
+## Release a new version
+
+This assumes you are a maintainer with push access to the `com.zendesk` group on Clojars.
+
+```bash
+./scripts/release.sh X.Y.Z
+```
