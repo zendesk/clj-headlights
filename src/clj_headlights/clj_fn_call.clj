@@ -42,7 +42,7 @@
     (catch Exception e
       (if (or (= 'clj-headlights.pardo ns-name)
               (= "class com.google.cloud.dataflow.worker.runners.worker.KeyTokenInvalidException" (str (class (.getCause e))))
-              (.startsWith (str (.getCause e)) "Unable to fetch data due to token mismatch for key"))
+              (.startsWith (.getMessage (.getCause e)) "Unable to fetch data due to token mismatch for key"))
         (throw e)
         (do
           (log/error "An exception happened, here is some extra information" (ex-info (str "Exception in " full-name) {:creation-stack creation-stack :params params :data args} e))
