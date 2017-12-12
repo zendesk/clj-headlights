@@ -45,7 +45,7 @@
               (.startsWith (.getMessage (.getCause e)) "Unable to fetch data due to token mismatch for key"))
         (throw e)
         (do
-          (log/error "An exception happened, here is some extra information" (ex-info (str "Exception in " full-name) {:creation-stack creation-stack :params params :data args} e))
+          (log/error "An exception happened, here is some extra information" (ex-info (str "Exception in " full-name) {:creation-stack creation-stack :params params :data (mapv pr-str args)} e))
           (throw e))))))
 
 (s/defn serializable-function :- CljSerializableFunction
