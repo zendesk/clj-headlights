@@ -37,17 +37,7 @@
 (defn clj-call-invoke
   [{:keys [full-name params ns-name creation-stack]} & args]
   (clj_headlights.System/ensureInitialized ns-name)
-  (try
-    (apply (var-get (find-var full-name)) (into (vec args) params))
-    (catch Exception e
-      (if (or (= 'clj-headlights.pardo ns-name)
-              (= "class com.google.cloud.dataflow.worker.runners.worker.KeyTokenInvalidException" (str (class (.getCause e))))
-              (.startsWith (.getMessage (.getCause e)) "Unable to fetch data due to token mismatch for key")
-              (.startsWith (.getMessage e) "Unable to fetch data due to token mismatch for key"))
-        (throw e)
-        (do
-          (log/error "An exception happened, here is some extra information" (ex-info (str "Exception in " full-name) {:creation-stack creation-stack :params params :data (mapv pr-str args)} e))
-          (throw e))))))
+  (apply (var-get (find-var full-name)) (into (vec args) params)))
 
 (s/defn serializable-function :- CljSerializableFunction
   [clj-call :- CljCall]
