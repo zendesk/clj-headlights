@@ -4,7 +4,7 @@
             [clojure.tools.logging :as log]
             [clojure.string :as string])
   (:import (clj_headlights CljSerializableFunction)
-           (clojure.lang Var)
+           (clojure.lang Var ExceptionInfo)
            (java.io ByteArrayOutputStream ObjectOutputStream Serializable)))
 
 (defn serializable? [^Serializable obj]
@@ -37,7 +37,11 @@
 (defn clj-call-invoke
   [{:keys [full-name params ns-name creation-stack]} & args]
   (clj_headlights.System/ensureInitialized ns-name)
-  (apply (var-get (find-var full-name)) (into (vec args) params)))
+  (try
+    (apply (var-get (find-var full-name)) (into (vec args) params))
+    (catch ExceptionInfo e
+      (log/error "An exception happened, here is some extra information " {:creation-stack creation-stack :params params :data (mapv pr-str args) :exception e})
+      (throw e))))
 
 (s/defn serializable-function :- CljSerializableFunction
   [clj-call :- CljCall]
