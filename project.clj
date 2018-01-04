@@ -9,8 +9,8 @@
                  [cheshire "5.7.0" :exclusions [com.fasterxml.jackson.core/jackson-core]]
                  [prismatic/schema "1.1.7"]
                  [com.taoensso/nippy "2.13.0"]
-                 [org.apache.beam/beam-sdks-java-core "2.1.0"]
-                 [org.apache.beam/beam-runners-google-cloud-dataflow-java "2.1.0" :exclusions [io.grpc/grpc-core io.netty/netty-codec-http2]]
+                 [org.apache.beam/beam-sdks-java-core "2.2.0"]
+                 [org.apache.beam/beam-runners-google-cloud-dataflow-java "2.2.0" :exclusions [io.grpc/grpc-core io.netty/netty-codec-http2]]
                  [com.google.cloud.bigtable/bigtable-hbase "1.0.0-pre3" :exclusions [io.grpc/grpc-core io.netty/netty-codec-http2 com.google.code.findbugs/jsr305]]
                  [com.google.cloud.bigtable/bigtable-protos "1.0.0-pre3" :exclusions [com.google.code.findbugs/jsr305]]
                  [com.google.cloud.bigtable/bigtable-hbase-1.x-shaded "1.0.0-pre3"]
@@ -21,7 +21,7 @@
   :profiles {:release {:dependencies [[org.clojure/clojure "1.8.0"]]}
              :dev [:release {:dependencies [[org.slf4j/slf4j-simple "1.7.21"]
                                             [org.slf4j/log4j-over-slf4j "1.7.21"]
-                                            [org.apache.beam/beam-runners-direct-java "2.1.0"]]}]
+                                            [org.apache.beam/beam-runners-direct-java "2.2.0"]]}]
              :test [:dev {:dependencies [[junit "4.12"]
                                          [org.hamcrest/hamcrest-all "1.3"]]}]
              :uberjar [:release {:aot :all}]}
