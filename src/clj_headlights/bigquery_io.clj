@@ -6,9 +6,10 @@
             [clj-headlights.utils :as utils]
             [clojure.tools.logging :as log]
             [clj-headlights.pcollections :as pcollections])
-  (:import (org.apache.beam.sdk.io.gcp.bigquery BigQueryIO$Write BigQueryIO$Write$CreateDisposition BigQueryIO$Write$WriteDisposition BigQueryIO$Read BigQueryIO)
+  (:import (org.apache.beam.sdk.io.gcp.bigquery BigQueryIO$Write BigQueryIO$Write$CreateDisposition BigQueryIO$Write$WriteDisposition BigQueryIO$Read BigQueryIO TableRowJsonCoder)
            (com.google.api.services.bigquery.model TableSchema TableFieldSchema TableRow)
-           (org.apache.beam.sdk.transforms SerializableFunction PTransform)))
+           (org.apache.beam.sdk.transforms SerializableFunction PTransform)
+           ))
 
 (def WriteDispostions
   {:write-append BigQueryIO$Write$WriteDisposition/WRITE_APPEND
@@ -77,10 +78,14 @@
   (let [bq-schema (-> (TableSchema.) (.setFields (mapv schema-field->bq-field schema)))
         {:keys [write-disposition create-disposition] :or
          {write-disposition :write-append create-disposition :create-if-needed}} write-options]
-    (-> pcoll
-        (df/df-map (str "make-table-row-" name) [#'table-row-maker schema])
-        (.apply (str "write-to-bq-" name) (-> (BigQueryIO/writeTableRows)
-                                              (.to output)
-                                              (.withSchema bq-schema)
-                                              (.withWriteDisposition (write-disposition WriteDispostions))
-                                              (.withCreateDisposition (create-disposition CreateDispositions)))))))
+    (df/composite
+     name
+     [pcoll]
+     (fn [pcoll]
+       (-> pcoll
+           (df/df-map-enc "make-table-row" (TableRowJsonCoder/of) [#'table-row-maker schema])
+           (.apply "write-to-bquery" (-> (BigQueryIO/writeTableRows)
+                                         (.to output)
+                                         (.withSchema bq-schema)
+                                         (.withWriteDisposition (write-disposition WriteDispostions))
+                                         (.withCreateDisposition (create-disposition CreateDispositions)))))))))
