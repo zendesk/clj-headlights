@@ -22,7 +22,7 @@
 (s/defn read-from-query :- PTransform
   [query :- s/Str]
   (log/info "reading from query " query)
-  (-> (BigQueryIO/read) (.fromQuery query)))
+  (-> (BigQueryIO/readTableRows) (.fromQuery query)))
 
 (s/defn read-from-query-and-extract :- pcollections/PCollectionType
   [pipeline :- pcollections/PCollectionType
