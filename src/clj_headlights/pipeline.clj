@@ -20,6 +20,7 @@
            (clj_headlights PipelineOptions EdnCoder NippyCoder)))
 
 (def get-side-output pardo/get-side-output)
+(def get-side-outputs pardo/get-side-outputs)
 
 (s/defn create :- Pipeline
   "Create a Pipeline object. This is the first building block of any Beam pipeline."

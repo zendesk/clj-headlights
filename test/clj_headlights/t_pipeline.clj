@@ -92,8 +92,14 @@
 
 (deftest df-map-with-side-outputs
   (testing "emits side outputs"
-    (let [outputs (-> (df-test/create-pcoll ["a" "b" "c" "hello" "MARKER world"])
-                      (df/df-map-cat-with-side-outputs "step" #'process [:marked-words :words-lengths-above-cut]))]
-      (df-test/pcoll-contains (df/get-side-output outputs :words-lengths-above-cut) [5 12])
-      (df-test/pcoll-contains (df/get-side-output outputs :marked-words) ["MARKER world"])
-      (df-test/pcoll-contains (df/get-side-output outputs :main) ["a" "b" "c"]))))
+    (let [output (-> (df-test/create-pcoll ["a" "b" "c" "hello" "MARKER world"])
+                     (df/df-map-cat-with-side-outputs "step" #'process [:marked-words :words-lengths-above-cut])
+                     (df/get-side-outputs))
+          output-keys (-> output keys)
+          [main marker counts] (df-test/pipeline-to-data (vals output))
+                     ]
+      (is (= (map (fn [tt] (keyword (.getId tt))) output-keys) '(:main :marked-words :words-lengths-above-cut)))
+      (is (= (sort main) '("a" "b" "c")))
+      (is (= marker  '("MARKER world")))
+      (is (= (sort counts)  '(5 12))))))
+
