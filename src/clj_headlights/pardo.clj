@@ -90,6 +90,11 @@
    tag]
   (.get pcoll (get-tag tag)))
 
+(defn get-side-outputs ; TODO: is about pcollections, should be moved to pcollections ns
+  "Retrieve the map of Tags to PCollections."
+  [^PCollectionTuple pcoll]
+  (.getAll pcoll))
+
 (s/defn set-side-output-coder :- PCollection  ; TODO: is about pcollections, should be moved to pcollections  ns
   "Sets the coder for the pcollection associated with a given tag in the output of a df-map-with-side-outputs."
   [pcoll :- PCollectionTuple
