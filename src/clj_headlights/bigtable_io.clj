@@ -1,6 +1,7 @@
 (ns clj-headlights.bigtable-io
   (:require [schema.core :as s]
             [clj-headlights.pipeline :as df]
+            [clj-headlights.clj-fn-call :refer[serializable-function]]
             [clj-headlights.pcollections :as pcollections])
   (:import (com.google.cloud.bigtable.config BigtableOptions$Builder)
            (org.apache.beam.sdk.io.gcp.bigtable BigtableIO BigtableIO$Write)
@@ -30,8 +31,8 @@
    [TableMutation]])
 
 (defn options-builder
-  [project instance-id user-agent]
-  (-> (BigtableOptions$Builder.)
+  [project instance-id user-agent builder]
+  (-> builder
       (.setProjectId project)
       (.setInstanceId instance-id)
       (.setUserAgent user-agent)
@@ -65,7 +66,7 @@
           (df/df-map "make-bigtable-kv" #'row->bigtable-kv)
           (.apply "write"
                   (-> ^BigtableIO$Write (BigtableIO/write)
-                      (.withBigtableOptions ^BigtableOptions$Builder (options-builder project instance user-agent))
+                      (.withBigtableOptionsConfigurator (serializable-function (partial options-builder project instance user-agent)))
                       (.withTableId table)))))))
 
 (defn get-cells-data
@@ -105,7 +106,7 @@
   (-> pipeline
       (.apply (str "read-from-bigtable-" name)
               (-> (BigtableIO/read)
-                  (.withBigtableOptions ^BigtableOptions$Builder (options-builder project instance user-agent))
+                  (.withBigtableOptionsConfigurator (serializable-function (partial options-builder project instance user-agent)))
                   (.withTableId table)))))
 
 (s/defn bigtable-io-read-table
