@@ -7,7 +7,7 @@
 (deftest options-builder
   (testing "builds bigtable options"
     (is (= BigtableOptions$Builder
-           (class (bigtable-io/options-builder "project" "instance" "agent"))))))
+           (class (bigtable-io/options-builder "project" "instance" "agent" (BigtableOptions$Builder.)))))))
 
 (deftest mutation-builder
   (testing "turns a clojure map into a mutation"
