@@ -11,7 +11,7 @@ It is not intended as a full replacement for the [Beam Java SDK](https://beam.ap
 
 Latest stable version
 ```clojure
-[com.zendesk/clj-headlights "0.1.3"]
+[com.zendesk/clj-headlights "0.1.4"]
 ```
 
 To get the latest build in from the master branch (may contain breaking changes)
