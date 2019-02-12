@@ -65,6 +65,13 @@
   (let [result (pardo/invoke-with-optional-state clj-call value state)]
     (.output context result)))
 
+(defn df-map-enc [pcoll name encoder clj-call]
+  (pardo/create-and-apply
+   pcoll
+   name
+   (clj-fn-call/append-argument-to-clj-call #'apply-to-value-and-output (clj-fn-call/to-serializable-clj-call clj-call))
+   {:outputs {:main encoder}}))
+
 (s/defn df-map :- PCollection
   "Returns a `PCollection` of the return values of function `clj-call` being applied to the
   input `pcoll` - used for strictly 1-to-1 transformations"
